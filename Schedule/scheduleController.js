@@ -86,41 +86,42 @@ const deleteBusSchedule = async (req, res) => {
 
 const searchBusSchedules = async (req, res) => {
   try {
+    // Log received search request
     console.log('Received search request:', req.body);
 
+    // Destructure request body
     const { origin, destination, date } = req.body;
 
-    console.log('Searching for bus schedules with criteria:', {
-      origin,
-      destination,
-      date,
-    });
+    // Log criteria for bus schedule search
+    console.log('Searching for bus schedules with criteria:', { origin, destination, date });
 
-    const schedules = await BusSchedule.find({
-      origin,
-      destination,
-      departureDate: date,
-    });
+    // Find bus schedules without populating related data
+    const schedules = await BusSchedule.find({ origin, destination, departureDate: date });
 
+    // Log Mongoose query conditions
     console.log('Mongoose Query:', schedules._conditions);
 
+    // Log found schedules before populating
     console.log('Found schedules before populate:', schedules);
 
+    // Find and populate related data (bus and company)
     const populatedSchedules = await BusSchedule.find({ origin, destination, departureDate: date })
-      .populate({
-        path: 'bus',
-        populate: { path: 'company' },
-      })
+      .populate({ path: 'bus', populate: { path: 'company' } })
       .exec();
 
-    console.log('Found matching schedules:', populatedSchedules);
-
+    // Log matching schedules with relevant information
     populatedSchedules.forEach((schedule, index) => {
-      if (schedule.bus && schedule.bus.company && schedule.bus.company.name) {
+      const busInfo = schedule.bus?.company?.name
+        ? {
+            seatArrangement: schedule.bus.seatArrangement,
+            companyName: schedule.bus.company.name,
+            classType: schedule.bus.classType,
+          }
+        : null;
+
+      if (busInfo) {
         console.log(`Match ${index + 1}:`, {
-          seatArrangement: schedule.bus.seatArrangement,
-          companyName: schedule.bus.company.name,
-          classType: schedule.bus.classType,
+          ...busInfo,
           origin: schedule.origin,
           destination: schedule.destination,
           departureDate: schedule.departureDate,
@@ -132,13 +133,14 @@ const searchBusSchedules = async (req, res) => {
       }
     });
 
+    // Respond with the populated schedules
     res.status(200).json(populatedSchedules);
   } catch (error) {
+    // Log and respond with an error if there's an exception
     console.error('Error in searchBusSchedules:', error);
     res.status(500).json({ error: error.message });
   }
 };
-
 
 
 

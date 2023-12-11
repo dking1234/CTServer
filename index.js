@@ -16,6 +16,7 @@ const ticketRoutes = require('./Ticket/ticketRoutes');
 const adminRoutes = require('./Admin/adminRoutes');
 const superAdminRoutes = require('./SuperAdmin/superAdminRoutes');
 const passengerRoutes = require('./Passenger/passengerRoutes');
+const seatsRoutes = require('./Seats/seatsRoutes');
 const bookingRoutes = require('./Booking/bookingRoutes');
 
 const app = express();
@@ -68,6 +69,7 @@ app.use('/api/admins', adminRoutes);
 app.use('/api/superadmin', superAdminRoutes);
 app.use('/api/passengers', passengerRoutes);
 app.use('/api', bookingRoutes);
+app.use('/api', seatsRoutes);
 
 // Start the server
 server.listen(port, () => {

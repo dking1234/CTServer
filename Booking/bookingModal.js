@@ -11,10 +11,15 @@ const bookingSchema = new mongoose.Schema({
     ref: 'BusSchedule', // Reference to the bus schedule that was booked
     required: true,
   },
+  seats:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref: 'Seats', // Reference to the
+    required: true,
+  },
   seats: [String], // An array of seat numbers that were booked
   status: {
     type: String,
-    enum: ['confirmed', 'pending', 'cancelled'], // Booking status
+    enum: ['booked', 'pending', 'cancelled'], // Booking status
     default: 'pending',
   },
   bookingDate: {

@@ -10,7 +10,7 @@ const { postPhoneNumber,
 // Define routes for each step
 router.post('/phone-number', postPhoneNumber); 
 router.post('/user-name', postUsername);
-router.get('/:phoneNumber', getUserByPhoneNumber);
+router.get('/username/:phoneNumber', getUserByPhoneNumber);
 router.put('/:phoneNumber', updateUserByPhoneNumber);
 router.delete('/:phoneNumber', deleteUserByPhoneNumber);       
 

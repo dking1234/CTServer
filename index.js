@@ -18,6 +18,7 @@ const superAdminRoutes = require('./SuperAdmin/superAdminRoutes');
 const passengerRoutes = require('./Passenger/passengerRoutes');
 const seatsRoutes = require('./Seats/seatsRoutes');
 const bookingRoutes = require('./Booking/bookingRoutes');
+const seatController = require('./Seats/seatsController');
 
 const app = express();
 const port = process.env.PORT || 80;
@@ -44,16 +45,18 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('User connected');
+  console.log(`User connected: ${socket.id}`);
 
-  // Handle seat selection event
-  socket.on('selectSeat', (seatNumber) => {
-      // Broadcast the selected seat to all connected clients
-      io.emit('updateSeats', seatNumber);
+  seatController.addUser(socket);
+
+   // Handle seat selection
+   socket.on('selectSeat', (seatId) => {  // Corrected event name from 'seatSelected' to 'selectSeat'
+    seatController.selectSeat(socket, seatId);  // Corrected function name from 'handleSeatSelection' to 'selectSeat'
   });
 
   socket.on('disconnect', () => {
-      console.log('User disconnected');
+    console.log(`User disconnected: ${socket.id}`);
+    seatController.removeUser(socket);
   });
 });
 

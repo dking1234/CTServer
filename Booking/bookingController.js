@@ -1,5 +1,34 @@
 const Booking = require('./bookingModal');
 const Schedule = require('../Schedule/scheduleModal');
+const Seat = require('../Seats/seatsModal'); // Add Seat import
+
+let io;
+
+function init(socketIO) {
+  io = socketIO;
+
+  // Your Socket.io logic for booking events
+  io.on('connection', (socket) => {
+    // Handle confirm payment events
+    socket.on('confirmPayment', (data) => {
+      const seatId = data.seatId;
+
+      // Notify seat controller to mark the seat as unavailable
+      io.emit('markUnavailable', { seatId });
+    });
+
+    // Handle release seat events
+    socket.on('releaseSeat', (data) => {
+      const seatId = data.seatId;
+
+      // Notify seat controller to release the seat
+      io.emit('releaseSeat', { seatId });
+    });
+
+    // Add more socket.io event handlers if needed
+  });
+}
+
 // Function to create a new booking
 const bookSeat = async (req, res) => {
   try {
@@ -19,7 +48,7 @@ const bookSeat = async (req, res) => {
       const seat = new Seat({
         schedule: scheduleId,
         seatNumber,
-        booked: false, // Assuming the seat is initially not booked
+        booked: true, // Change to true when the seat is booked
       });
 
       await seat.save();
@@ -28,41 +57,21 @@ const bookSeat = async (req, res) => {
       schedule.seatsBooked += 1;
       await schedule.save();
 
-      // Book the seat with a pending status
+      // Book the seat with a confirmed status
       const booking = new Booking({
         schedule: scheduleId,
         seatNumber,
         userId,
-        booked: false,
-        status: 'pending',
+        booked: true,
+        status: 'confirmed', // Change to 'confirmed' since the payment is successful
       });
 
       await booking.save();
 
-      // Set a timeout for payment confirmation
-      const paymentTimeout = 5 * 60 * 1000; // 5 minutes
-      setTimeout(async () => {
-        // Check if the payment was confirmed within the timeout period
-        const confirmedBooking = await Booking.findById(booking._id);
-        if (confirmedBooking && confirmedBooking.status === 'pending') {
-          // If not confirmed, release the seat
-          schedule.seatsBooked -= 1;
-          await schedule.save();
-
-          // Update the booking status to cancelled
-          confirmedBooking.status = 'cancelled';
-          await confirmedBooking.save();
-        }
-      }, paymentTimeout);
-
-      res.json({ success: true, message: 'Seat booked with pending status', booking });
+      res.json({ success: true, message: 'Seat booked successfully', booking });
     } else {
       // Seat is already booked
-      // You can update the existing booking information here
-      existingBooking.status = 'pending'; // Update the status or any other fields as needed
-      await existingBooking.save();
-
-      return res.json({ success: true, message: 'Seat already booked', booking: existingBooking });
+      return res.json({ success: false, message: 'Seat already booked', booking: existingBooking });
     }
   } catch (error) {
     console.error('Error booking seat:', error);
@@ -70,7 +79,6 @@ const bookSeat = async (req, res) => {
   }
 };
 
-  
 // Function to get a list of all bookings
 const getAllBookings = async (req, res) => {
   try {
@@ -158,8 +166,8 @@ const cancelBooking = async (req, res) => {
   }
 };
 
-
 module.exports = {
+  init,
   bookSeat,
   getAllBookings,
   getBookingsByUser,

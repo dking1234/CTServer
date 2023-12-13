@@ -1,34 +1,49 @@
+// TicketModal.js
 const mongoose = require('mongoose');
 
+// Define the Ticket schema
 const ticketSchema = new mongoose.Schema({
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Reference to the User model
+    ref: 'User', // Replace 'User' with the actual model name for your user schema
     required: true,
   },
-  busSchedule: {
+  scheduleId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'BusSchedule', // Reference to the BusSchedule model
+    ref: 'Schedule', // Replace 'Schedule' with the actual model name for your schedule schema
+    required: true,
+  },
+  companyName: {
+    type: String,
+    required: true,
+  },
+  departureDate: {
+    type: Date,
+    required: true,
+  },
+  departureTime: {
+    type: String,
     required: true,
   },
   seatNumber: {
     type: String,
     required: true,
   },
-  purchaseDate: {
-    type: Date,
-    default: Date.now,
+  origin: {
+    type: String,
+    required: true,
+  },
+  destination: {
+    type: String,
+    required: true,
   },
   price: {
     type: Number,
     required: true,
   },
-  status: {
-    type: String,
-    enum: ['booked', 'cancelled', 'completed'], // Ticket status options
-    default: 'booked',
-  },
-  // You can add additional fields for further details
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model('Ticket', ticketSchema);
+// Create the Ticket model
+const Ticket = mongoose.model('Ticket', ticketSchema);
+
+module.exports = Ticket;

@@ -41,7 +41,7 @@ const busSchema = new mongoose.Schema({
   classType: {
     type: String,
     required: true,
-    enum: ['Economy', 'Luxury', 'First Class'], // Enum to restrict to certain values
+    enum: ['Economy', 'Luxury', 'First'], // Enum to restrict to certain values
   },
   // Add additional fields as needed
 });

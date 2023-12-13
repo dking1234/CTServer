@@ -93,6 +93,47 @@ const getUserByPhoneNumber = async (req, res) => {
   }
 };
 
+const getUserIdFromPhoneNumber = async (req, res) => {
+  try {
+    let { phoneNumber } = req.params;
+
+    // Ensure phoneNumber starts with '+255'
+    if (!phoneNumber.startsWith('+255')) {
+      // Add '+255' to the beginning of the phoneNumber
+      phoneNumber = '+255' + phoneNumber;
+    }
+
+    const user = await User.findOne({ phoneNumber });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Return only the user's ID
+    res.json({ userId: user._id });
+  } catch (error) {
+    console.error('Error in getUserIdFromPhoneNumber:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the user details' });
+  }
+};
+
+const getUserFromUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error in getUserFromUserId:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the user details' });
+  }
+};
+
 
 const updateUserByPhoneNumber = async (req, res) => {
   try {
@@ -154,4 +195,6 @@ module.exports = {
   getUserByPhoneNumber,
   updateUserByPhoneNumber,
   deleteUserByPhoneNumber,
+  getUserIdFromPhoneNumber,
+  getUserFromUserId
 };

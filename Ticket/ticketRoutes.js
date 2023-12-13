@@ -5,13 +5,14 @@ const {
   updateTicketStatus,
   deleteTicket,
   getUserTickets,
-  getTicketById
+  getTicketById,
+  getTicketIdByScheduleId
 } = require('./ticketController');
 
-router.post('/tickets', createTicket);
+router.post('/create-tickets', createTicket);
 router.put('/tickets/:ticketId/status', updateTicketStatus);
 router.delete('/tickets/:ticketId', deleteTicket);
-router.get('/users/:userId/tickets', getUserTickets);
+router.get('/tickets/user/:userId', getUserTickets);
 router.get('/tickets/:ticketId', getTicketById);
 
 module.exports = router;

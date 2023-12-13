@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const seatSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  seatNumber: { type: String, required: true },
   booked: { type: Boolean, default: false },
 });
 

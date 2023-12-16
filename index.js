@@ -21,7 +21,7 @@ const bookingRoutes = require('./Booking/bookingRoutes');
 const seatController = require('./Seats/seatsController');
 
 const app = express();
-const port = process.env.PORT || 443;
+const port = process.env.PORT || 80;
 const server = http.createServer(app);
 const io = socketIO(server);
 

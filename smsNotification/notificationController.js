@@ -1,12 +1,12 @@
-const twilio = require('twilio');
+const axios = require('axios');
 const otpController = require('../OTP/otpController');
 
-// Your Twilio credentials
-const accountSid = 'AC2cdf319ea5250445b31f24e63cfcb5a2';
-const authToken = '8bdc39f5a160baf4c4bd892c70f1002a';
-const twilioPhoneNumber = '+19122920125';
+// Set your Infobip API key and sender ID
+const infobipApiKey = 'f714b38c490a6cbf001432ab7ac7e3a0-ec1062d3-8bea-404d-a649-f583a7f1f2e3';
+const infobipSenderId = 'InfoSMS';
 
-const client = twilio(accountSid, authToken);
+// Corrected Infobip API endpoint URL
+const infobipApiUrl = 'https://api.infobip.com/sms/1/text/single';
 
 const sendNotification = async (phoneNumber) => {
   try {
@@ -15,16 +15,33 @@ const sendNotification = async (phoneNumber) => {
 
     const messageBody = `Your OTP is: ${otp}`;
 
-    const message = await client.messages.create({
-      body: messageBody,
-      from: twilioPhoneNumber,
-      to: phoneNumber
-    });
+    // Send the SMS using Infobip
+    const response = await axios.post(
+      infobipApiUrl,
+      {
+        from: infobipSenderId,
+        to: phoneNumber,
+        text: messageBody,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `App ${infobipApiKey}`,
+        },
+      }
+    );
 
-    console.log(`OTP sent successfully to ${phoneNumber}. Message SID: ${message.sid}`);
+    console.log(`OTP sent successfully to ${phoneNumber}. Response: ${JSON.stringify(response.data)}`);
+    
+    // Additional logging for debugging
+    console.log('Infobip API Response:', response.data);
+    
     return true;
   } catch (error) {
-    console.error(`Error sending OTP via Twilio: ${error.message}`);
+    console.error(`Error sending OTP via Infobip: ${error.message}`);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+    }
     return false;
   }
 };

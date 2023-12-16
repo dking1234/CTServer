@@ -78,13 +78,19 @@ const deleteTicket = async (req, res) => {
 
 // Get all tickets for a user
 const getUserTickets = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const tickets = await Ticket.find({ user: userId });
+   try {
+    const userId = req.params.userId;
+
+    const tickets = await Ticket.find({ userId });
+
+    if (!tickets) {
+      return res.status(404).json({ message: 'Tickets not found for the given userId' });
+    }
+
     res.status(200).json(tickets);
-    console.log(tickets);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to get tickets', error: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 

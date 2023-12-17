@@ -8,8 +8,8 @@ module.exports = {
         watch: false,
         max_memory_restart: '1G',
         env: {
-          NODE_ENV: 'production',
-          PORT: 443, // Set HTTPS port
+          NODE_ENV: 'preview',
+          PORT: 5000, // Set HTTPS port
           // Add other environment variables if needed
         },
       },

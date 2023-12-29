@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: false, // Initially false because the username is added after the phone number
-    unique: true, // If you want the usernames to be unique
+    unique: false, // If you want the usernames to be unique
     trim: true, // Trims whitespace
     minlength: 3, // Sets a minimum length if you require
     maxlength: 30 // Sets a maximum length if you require

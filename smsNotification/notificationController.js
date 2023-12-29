@@ -10,9 +10,11 @@ const infobipApiUrl = 'https://api.infobip.com/sms/1/text/single';
 
 const sendNotification = async (phoneNumber) => {
   try {
+    // Generate OTP and save it
     const otp = otpController.generateOTP();
     await otpController.saveOTP(phoneNumber, otp);
 
+    // Compose the message body
     const messageBody = `Your OTP is: ${otp}`;
 
     // Send the SMS using Infobip
@@ -31,17 +33,19 @@ const sendNotification = async (phoneNumber) => {
       }
     );
 
+    // Log success and Infobip API response
     console.log(`OTP sent successfully to ${phoneNumber}. Response: ${JSON.stringify(response.data)}`);
-    
-    // Additional logging for debugging
-    console.log('Infobip API Response:', response.data);
     
     return true;
   } catch (error) {
+    // Handle errors
     console.error(`Error sending OTP via Infobip: ${error.message}`);
-    if (error.response) {
-      console.error('Response data:', error.response.data);
+    if (axios.isAxiosError(error)) {
+      console.error('Network error:', error.message);
+    } else if (error.response) {
+      console.error('Infobip API error:', error.response.data);
     }
+
     return false;
   }
 };

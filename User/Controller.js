@@ -22,6 +22,8 @@ const postPhoneNumber = async (req, res) => {
     await user.save();
 
     const success = await notificationController.sendNotification(phoneNumber);
+    console.log('OTP Generation and Sending Success:', success);
+
 
     if (success) {
       res.json({ message: 'Phone number saved, and OTP sent successfully' });

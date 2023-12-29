@@ -1,10 +1,12 @@
-const https = require('follow-redirects').https;
+const axios = require('axios');
 const otpController = require('../OTP/otpController');
 
-const infobipApiKey = 'f714b38c490a6cbf001432ab7ac7e3a0-ec1062d3-8bea-404d-a649-f583a7f1f2e3';
+// Set your Infobip API key and sender ID
+const infobipApiKey = '63bcc8ee6d2aca8ad251fb3b42f29e72-7e5e4e85-9347-400e-8113-4dca245e1fa5';
 const infobipSenderId = 'InfoSMS';
-const infobipApiHost = 'z1r8r6.api.infobip.com';
-const infobipApiPath = '/sms/2/text/advanced';
+
+// Corrected Infobip API endpoint URL
+const infobipApiUrl = 'https://api.infobip.com/sms/1/text/single';
 
 const sendNotification = async (phoneNumber) => {
   try {
@@ -16,60 +18,34 @@ const sendNotification = async (phoneNumber) => {
     const messageBody = `Your OTP is: ${otp}`;
 
     // Send the SMS using Infobip
-    const postData = JSON.stringify({
-      messages: [
-        {
-          destinations: [
-            {
-              to: phoneNumber,
-            },
-          ],
-          from: infobipSenderId,
-          text: messageBody,
-        },
-      ],
-    });
-
-    const options = {
-      method: 'POST',
-      hostname: infobipApiHost,
-      path: infobipApiPath,
-      headers: {
-        Authorization: `App ${infobipApiKey}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+    const response = await axios.post(
+      infobipApiUrl,
+      {
+        from: infobipSenderId,
+        to: phoneNumber,
+        text: messageBody,
       },
-    };
-
-    const response = await new Promise((resolve, reject) => {
-      const req = https.request(options, (res) => {
-        let chunks = [];
-
-        res.on('data', (chunk) => {
-          chunks.push(chunk);
-        });
-
-        res.on('end', () => {
-          const body = Buffer.concat(chunks);
-          resolve(JSON.parse(body.toString()));
-        });
-      });
-
-      req.on('error', (error) => {
-        reject(error);
-      });
-
-      req.write(postData);
-      req.end();
-    });
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `App ${infobipApiKey}`,
+        },
+      }
+    );
 
     // Log success and Infobip API response
-    console.log(`OTP sent successfully to ${phoneNumber}. Response: ${JSON.stringify(response)}`);
-
+    console.log(`OTP sent successfully to ${phoneNumber}. Response: ${JSON.stringify(response.data)}`);
+    
     return true;
   } catch (error) {
     // Handle errors
     console.error(`Error sending OTP via Infobip: ${error.message}`);
+    if (axios.isAxiosError(error)) {
+      console.error('Network error:', error.message);
+    } else if (error.response) {
+      console.error('Infobip API error:', error.response.data);
+    }
+
     return false;
   }
 };

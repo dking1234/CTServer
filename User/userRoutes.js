@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { 
-  postPhoneNumber, 
-  postUsername,
+  postPhoneNumberAndUsername,
   getUserByPhoneNumber,
   getUserIdFromPhoneNumber,
   updateUserByPhoneNumber,
@@ -11,8 +10,7 @@ const {
 } = require('./Controller');
 
 // Define routes for each step
-router.post('/phone-number', postPhoneNumber); 
-router.post('/user-name', postUsername);
+router.post('/save-user', postPhoneNumberAndUsername); 
 router.get('/username/:phoneNumber', getUserByPhoneNumber);
 router.get('/userId/:phoneNumber', getUserIdFromPhoneNumber);
 router.get('/user/:userId', getUserFromUserId); // Add this line

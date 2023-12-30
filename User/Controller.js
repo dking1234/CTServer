@@ -2,85 +2,31 @@ const notificationController = require('../smsNotification/notificationControlle
 const User = require('./Modal');
 
 
-const postPhoneNumber = async (req, res) => {
+const postPhoneNumberAndUsername = async (req, res) => {
   try {
-    let { phoneNumber } = req.body;
-
-    // Ensure phoneNumber starts with '+255'
-    if (!phoneNumber.startsWith('+255')) {
-      // Add '+255' to the beginning of the phoneNumber
-      phoneNumber = '+255' + phoneNumber;
-    }
+    let { phoneNumber, firstName, lastName } = req.body;
 
     const existingUser = await User.findOne({ phoneNumber });
 
     if (existingUser) {
-      return res.status(409).json({ error: 'Phone number already exists' });
+      return res.status(409).json({ error: 'Phone number already in use. Please choose a different one.' });
     }
 
-    const user = new User({ phoneNumber });
+    const combinedUsername = `${firstName} ${lastName}`;
+
+    const user = new User({ phoneNumber, username: combinedUsername });
     await user.save();
 
-    const success = await notificationController.sendNotification(phoneNumber);
-    console.log('OTP Generation and Sending Success:', success);
-
-
-    if (success) {
-      res.json({ message: 'Phone number saved, and OTP sent successfully' });
-    } else {
-      res.status(500).json({ error: 'An error occurred during OTP generation' });
-    }
+    res.json({ success: true, message: 'Phone number and username saved successfully' });
   } catch (error) {
-    console.error('Error in postPhoneNumber:', error);
+    console.error('Error in postPhoneNumberAndUsername:', error);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 };
 
-
-const postUsername = async (req, res) => {
-  try {
-    let { phoneNumber, firstName, lastName } = req.body;
-
-    // Ensure phoneNumber starts with '+255'
-    if (!phoneNumber.startsWith('+255')) {
-      // Add '+255' to the beginning of the phoneNumber
-      phoneNumber = '+255' + phoneNumber;
-    }
-
-    // Find the user by their phone number
-    const user = await User.findOne({ phoneNumber });
-
-    if (!user) {
-      // If the user does not exist, send an error response
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Combine first name and last name to form a username
-    // Assuming the space between first name and last name is not desired in the username
-    const combinedUsername = `${firstName} ${lastName}`;
-
-    // Update the user's profile with the new username
-    user.username = combinedUsername;
-    await user.save();
-
-    // Send a success message
-    res.json({ success: true, message: 'Username updated successfully' });
-  } catch (error) {
-    console.error('Error in postUsername:', error);
-    res.status(500).json({ error: 'An error occurred during username update' });
-  }
-};
-
-
 const getUserByPhoneNumber = async (req, res) => {
   try {
     let { phoneNumber } = req.params;
-
-    // Ensure phoneNumber starts with '+255'
-    if (!phoneNumber.startsWith('+255')) {
-      // Add '+255' to the beginning of the phoneNumber
-      phoneNumber = '+255' + phoneNumber;
-    }
 
     const user = await User.findOne({ phoneNumber });
 
@@ -98,12 +44,6 @@ const getUserByPhoneNumber = async (req, res) => {
 const getUserIdFromPhoneNumber = async (req, res) => {
   try {
     let { phoneNumber } = req.params;
-
-    // Ensure phoneNumber starts with '+255'
-    if (!phoneNumber.startsWith('+255')) {
-      // Add '+255' to the beginning of the phoneNumber
-      phoneNumber = '+255' + phoneNumber;
-    }
 
     const user = await User.findOne({ phoneNumber });
 
@@ -140,12 +80,6 @@ const getUserFromUserId = async (req, res) => {
 const updateUserByPhoneNumber = async (req, res) => {
   try {
     let { phoneNumber } = req.params;
-
-    // Ensure phoneNumber starts with '+255'
-    if (!phoneNumber.startsWith('+255')) {
-      // Add '+255' to the beginning of the phoneNumber
-      phoneNumber = '+255' + phoneNumber;
-    }
 
     const updateData = req.body; // Data to update
 
@@ -192,8 +126,7 @@ const deleteUserByPhoneNumber = async (req, res) => {
 
 
 module.exports = {
-  postPhoneNumber,
-  postUsername,
+  postPhoneNumberAndUsername,
   getUserByPhoneNumber,
   updateUserByPhoneNumber,
   deleteUserByPhoneNumber,

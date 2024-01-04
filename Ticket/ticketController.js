@@ -5,7 +5,7 @@ const User = require('../User/Modal');
 // Create a new ticket
 const createTicket = async (req, res) => {
   try {
-    const { userId, scheduleId, companyName, seatNumbers, total } = req.body;
+    const { userId, scheduleId, companyName, seatNumber, total } = req.body;
 
     const paymentConfirmed = true; // Replace with your actual payment confirmation logic.
 
@@ -31,7 +31,7 @@ const createTicket = async (req, res) => {
         companyName,
         departureDate,
         departureTime,
-        seatNumbers,
+        seatNumber,
         origin,
         destination,
         price: total,

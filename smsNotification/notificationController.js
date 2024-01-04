@@ -1,56 +1,44 @@
-const axios = require('axios');
 const otpController = require('../OTP/otpController');
+const twilio = require('twilio');
 
-// Set your Infobip API key and sender ID
-const infobipApiKey = '63bcc8ee6d2aca8ad251fb3b42f29e72-7e5e4e85-9347-400e-8113-4dca245e1fa5';
-const infobipSenderId = 'InfoSMS';
+// Set your Twilio account SID, authentication token, and phone number
+const twilioAccountSid = 'AC2cdf319ea5250445b31f24e63cfcb5a2';
+const twilioAuthToken = '8bdc39f5a160baf4c4bd892c70f1002a';
+const twilioPhoneNumber = '+19122920125';
 
-// Infobip API endpoint URL for advanced SMS
-const infobipApiUrl = 'https://z1r8r6.api.infobip.com/sms/2/text/advanced';
+// Initialize the Twilio client
+const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
 
-const sendNotification = async (phoneNumber, req, res) => { // add req and res here
+const sendNotification = async (phoneNumber, req, res) => {
   try {
     // Generate OTP and save it
     const otp = otpController.generateOTP();
     await otpController.saveOTP(phoneNumber, otp);
 
-    // Compose the message body and encode HTML entities
+    // Compose the message body
     const messageBody = `Your OTP is: ${otp}`;
 
-    // Compose Infobip request payload
-    const infobipPayload = {
-      messages: [
-        {
-          from: infobipSenderId,
-          destinations: [{ to: phoneNumber }],
-          text: messageBody,
-        },
-      ],
-    };
-
-    // Send the SMS using Infobip advanced endpoint
-    const response = await axios.post(infobipApiUrl, infobipPayload, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `App ${infobipApiKey}`,
-      },
+    // Send the SMS using Twilio
+    const message = await twilioClient.messages.create({
+      body: messageBody,
+      from: twilioPhoneNumber,
+      to: phoneNumber,
     });
 
-    // Log success and Infobip API response
-    console.log(`OTP sent successfully to ${phoneNumber}. Response: ${JSON.stringify(response.data)}`);
+    // Log success and Twilio API response
+    console.log(`OTP sent successfully to ${phoneNumber}. Response: ${JSON.stringify(message)}`);
 
-    return res.json({ message: 'OTP sent successfully' }); // send a response
+    return res.json({ message: 'OTP sent successfully' });
 
   } catch (error) {
     // Handle errors
-    console.error(`Error sending OTP via Infobip: ${error.message}`);
-    if (axios.isAxiosError(error)) {
-      console.error('Network error:', error.message);
-    } else if (error.response) {
-      console.error('Infobip API error:', error.response.data);
+    console.error(`Error sending OTP via Twilio: ${error.message}`);
+    
+    if (error.code) {
+      console.error('Twilio error code:', error.code);
     }
 
-    return res.status(500).json({ error: 'An unexpected error occurred' }); // send an error response
+    return res.status(500).json({ error: 'An unexpected error occurred' });
   }
 };
 

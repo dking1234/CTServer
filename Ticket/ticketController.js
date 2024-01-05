@@ -5,7 +5,7 @@ const User = require('../User/Modal');
 // Create a new ticket
 const createTicket = async (req, res) => {
   try {
-    const { userId, scheduleId, companyName, seatNumber, total } = req.body;
+    const { userId, scheduleId, companyName, seatNumber, total, boardingPoint, droppingPoint } = req.body;
 
     const paymentConfirmed = true; // Replace with your actual payment confirmation logic.
 
@@ -20,6 +20,7 @@ const createTicket = async (req, res) => {
       const {
         departureDate,
         departureTime,
+        arrivalTime,
         origin,
         destination,
       } = scheduleDetails;
@@ -31,9 +32,12 @@ const createTicket = async (req, res) => {
         companyName,
         departureDate,
         departureTime,
+        arrivalTime,
         seatNumber,
         origin,
         destination,
+        boardingPoint, // Include boardingPoint
+        droppingPoint, // Include droppingPoint
         price: total,
       });
 
@@ -49,6 +53,8 @@ const createTicket = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
+
 
 // Update ticket status
 const updateTicketStatus = async (req, res) => {

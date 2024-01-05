@@ -25,6 +25,10 @@ const ticketSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  arrivalTime: {
+    type: String, // Change the type to match your requirements (e.g., Date, String)
+    required: true,
+  },
   seatNumber: {
     type: String,
     required: true,
@@ -35,6 +39,14 @@ const ticketSchema = new mongoose.Schema({
   },
   destination: {
     type: String,
+    required: true,
+  },
+  boardingPoint: {
+    type: String, // Add a field for boarding point
+    required: true,
+  },
+  droppingPoint: {
+    type: String, // Add a field for dropping point
     required: true,
   },
   price: {

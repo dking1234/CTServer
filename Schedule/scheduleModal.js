@@ -33,9 +33,20 @@ const scheduleSchema = new mongoose.Schema({
   seatsBooked: {
     type: Number,
     required: true,
-    default: 0, // Default value when a new schedule is created is 0
-  }
+    default: 0,
+  },
+  boardingPoints: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  droppingPoints: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
 });
-
 
 module.exports = mongoose.model('BusSchedule', scheduleSchema);

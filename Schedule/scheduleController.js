@@ -5,7 +5,7 @@ const Bus = require('../Bus/busModal');
 const createBusSchedule = async (req, res) => {
   try {
     // Assume busId is passed in the request to link the schedule to a bus
-    const { busId, origin, destination, departureTime, arrivalTime, departureDate, price } = req.body;
+    const { busId, origin, destination, departureTime, arrivalTime, departureDate, price, boardingPoints, droppingPoints } = req.body;
 
     // You can perform additional checks here, like if the busId exists, etc.
     const newBusSchedule = new BusSchedule({
@@ -16,7 +16,9 @@ const createBusSchedule = async (req, res) => {
       arrivalTime,
       departureDate,
       price,
-      seatsBooked: 0 // Initialize with 0 booked seats
+      seatsBooked: 0, // Initialize with 0 booked seats
+      boardingPoints,
+      droppingPoints,
     });
 
     const savedSchedule = await newBusSchedule.save();
@@ -25,6 +27,7 @@ const createBusSchedule = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Get all bus schedules
 const getAllBusSchedules = async (req, res) => {
@@ -53,7 +56,7 @@ const getBusScheduleById = async (req, res) => {
 const updateBusSchedule = async (req, res) => {
   try {
     const { id } = req.params;
-    const { origin, destination, departureTime, arrivalTime, departureDate, price } = req.body;
+    const { origin, destination, departureTime, arrivalTime, departureDate, price, boardingPoints, droppingPoints } = req.body;
 
     const updatedSchedule = await BusSchedule.findByIdAndUpdate(id, {
       origin,
@@ -61,7 +64,9 @@ const updateBusSchedule = async (req, res) => {
       departureTime,
       arrivalTime,
       departureDate,
-      price
+      price,
+      boardingPoints,
+      droppingPoints,
     }, { new: true }).populate('bus');
 
     if (!updatedSchedule) {
@@ -72,6 +77,7 @@ const updateBusSchedule = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Delete a bus schedule
 const deleteBusSchedule = async (req, res) => {
